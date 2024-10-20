@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lua スクリプト生成ツール</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .cheat-forms {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Lua スクリプト生成ツール</h1>
+    <h1>Dev by t0x1c</h1>
+    <p><a href="https://discord.gg/t0xxx" target="_blank">Join Discord!</a></p>
+    
+    <form id="scriptForm">
+        <label for="menu_count">メニューの個数:</label>
+        <input type="number" id="menu_count" name="menu_count" min="1" onchange="generateMenuForms()" required>
+
+        <div id="menuForms"></div>
+
+        <button type="button" onclick="generateScript()">スクリプトを生成</button>
+    </form>
+
+    <h2>生成されたスクリプト:</h2>
+    <pre id="generatedScript"></pre>
+    <button id="downloadButton" style="display:none;">ダウンロード</button>
+
+    <script>
+        function generateMenuForms() {
+            const menuCount = document.getElementById('menu_count').value;
+            const menuFormsContainer = document.getElementById('menuForms');
+            menuFormsContainer.innerHTML = ''; // 既存のフォームをクリア
+
+            for (let i = 1; i <= menuCount; i++) {
+                const menuDiv = document.createElement('div');
+                menuDiv.className = 'cheat-forms';
+                menuDiv.innerHTML = `
+                    <label for="menuName${i}">メニュー名${i}:</label>
+                    <input type="text" id="menuName${i}" placeholder="メニュー名を入力" required>
+                    
+                    <label for="cheatCount${i}">チートの個数:</label>
+                    <input type="number" id="cheatCount${i}" name="cheatCount${i}" min="1" value="1" onchange="generateCheatForms(${i})" required>
+
+                    <div id="cheatForms${i}"></div>
+                `;
+                menuFormsContainer.appendChild(menuDiv);
+            }
+            generateCheatForms(1); // 初回メニューのチートフォームを生成
+        }
+
+        function generateCheatForms(menuIndex) {
+            const cheatCount = document.getElementById(`cheatCount${menuIndex}`).value;
+            const container = document.getElementById(`cheatForms${menuIndex}`);
+            container.innerHTML = ''; // 既存のフォームをクリア
+
+            for (let j = 1; j <= cheatCount; j++) {
+                const cheatDiv = document.createElement('div');
+                cheatDiv.innerHTML = `
+                    <label for="cheatName${menuIndex}_${j}">チート${j}の名前:</label>
+                    <input type="text" id="cheatName${menuIndex}_${j}" placeholder="チート名を入力" required><br>
+                    <label for="onCode${menuIndex}_${j}">ONコード:</label>
+                    <input type="text" id="onCode${menuIndex}_${j}" placeholder="ONコードを入力" required><br>
+                    <label for="offCode${menuIndex}_${j}">OFFコード:</label>
+                    <input type="text" id="offCode${menuIndex}_${j}" placeholder="OFFコードを入力" required><br>
+                `;
+                container.appendChild(cheatDiv);
+            }
+        }
+
+        function generateScript() {
+            let luaScript = `
+gg.clearResults()
+gg.alert("made by t0x1c", 'start')
+
+function Main()
+    local menu = gg.choice({
+            `;
+            const menuCount = document.getElementById('menu_count').value;
+
+            for (let i = 1; i <= menuCount; i++) {
+                const menuName = document.getElementById(`menuName${i}`).value;
+                luaScript += `        "${menuName}",\n`;
+            }
+
+            luaScript += '        "終了",\n';
+            luaScript += '    }, nil, "Easy script | t0x1c")\n\n';
+            luaScript += '    if menu == nil then\n';
+            luaScript += '        return\n';
+            luaScript += '    end\n';
+
+            for (let i = 1; i <= menuCount; i++) {
+                luaScript += `    if menu == ${i} then AAA${i}() end\n`;
+            }
+
+            luaScript += `    if menu == ${menuCount + 1} then exit() end\n`;
+            luaScript += 'end\n\n';
+
+            for (let i = 1; i <= menuCount; i++) {
+                const cheatCount = document.getElementById(`cheatCount${i}`).value;
+                for (let j = 1; j <= cheatCount; j++) {
+                    luaScript += `toggle_${String(i).padStart(3, '0')}_${String(j).padStart(3, '0')} = false\n`;
+                }
+            }
+
+            for (let i = 1; i <= menuCount; i++) {
+                luaScript += `\nfunction AAA${i}()\n`;
+                const cheatCount = document.getElementById(`cheatCount${i}`).value;
+
+                for (let j = 1; j <= cheatCount; j++) {
+                    const cheatName = document.getElementById(`cheatName${i}_${j}`).value;
+                    luaScript += `    local state_${String(i).padStart(3, '0')}_${String(j).padStart(3, '0')} = toggle_${String(i).padStart(3, '0')}_${String(j).padStart(3, '0')} and "${cheatName} OFF" or "${cheatName} ON"\n`;
+                }
+
+                luaScript += `    local A${i} = gg.multiChoice({\n`;
+                for (let j = 1; j <= cheatCount; j++) {
+                    luaScript += `        state_${String(i).padStart(3, '0')}_${String(j).padStart(3, '0')},\n`;
+                }
+                luaScript += '        "戻る",\n';
+                luaScript += '    }, nil, "Easy-Script")\n\n';
+
+                luaScript += `    if A${i} == nil then return end\n`; 
+                for (let j = 1; j <= cheatCount; j++) {
+                    luaScript += `    if A${i}[${j}] == true then B${String(i).padStart(3, '0')}_${String(j).padStart(3, '0')}() end\n`;
+                }
+
+                luaScript += `    if A${i}[${cheatCount + 1}] == true then Main() end\n`;
+                luaScript += 'end\n';
+            }
+
+            for (let i = 1; i <= menuCount; i++) {
+                const cheatCount = document.getElementById(`cheatCount${i}`).value;
+                for (let j = 1; j <= cheatCount; j++) {
+                    const cheatName = document.getElementById(`cheatName${i}_${j}`).value;
+                    luaScript += `\nfunction B${String(i).padStart(3, '0')}_${String(j).padStart(3, '0')}()\n`;
+                    luaScript += `    if toggle_${String(i).padStart(3, '0')}_${String(j).padStart(3, '0')} then\n`;
+                    luaScript += `        gg.toast("${cheatName} OFF")\n`;
+                    luaScript += `    else\n`;
+                    luaScript += `        gg.toast("${cheatName} ON")\n`;
+                    luaScript += `    end\n`;
+                    luaScript += `    toggle_${String(i).padStart(3, '0')}_${String(j).padStart(3, '0')} = not toggle_${String(i).padStart(3, '0')}_${String(j).padStart(3, '0')}\n`;
+                    luaScript += 'end\n';
+                }
+            }
+
+            luaScript += `
+function exit()
+    gg.toast("終了!")
+    print("Easy Script by t0x1c")
+    gg.clearResults()
+    os.exit()    
+end
+
+while true do 
+    if gg.isVisible() then
+        gg.setVisible(false)
+        Main()
+    end
+    gg.sleep(10)
+end
+`;
+
+            document.getElementById('generatedScript').textContent = luaScript;
+            document.getElementById('downloadButton').style.display = 'block'; // ダウンロードボタンを表示
+            document.getElementById('downloadButton').onclick = function() {
+                downloadScript(luaScript);
+            };
+        }
+
+        function downloadScript(script) {
+            const blob = new Blob([script], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'EasyScript.lua'; // ダウンロードするファイル名
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+
+</body>
+</html>
