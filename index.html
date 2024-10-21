@@ -230,13 +230,15 @@ function Main()
         }
 
         function downloadScript() {
-            const scriptContent = document.getElementById('Easy-Scripts').textContent;
+            const scriptContent = document.getElementById('EasyScript')
             const blob = new Blob([scriptContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'generated_script.lua';
+            a.download = 'EasyScript.lua';
+	　　document.body.appendChild(a);
             a.click();
+	　　document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
     </script>
