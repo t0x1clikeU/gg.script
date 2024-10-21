@@ -65,7 +65,7 @@
 
     <h2>生成されたスクリプト:</h2>
     <pre id="generatedScript"></pre>
-    <button id="downloadButton" style="display:none;">ダウンロード</button>
+    <button id="downloadButton" style="display:none;" onclick="downloadScript()">ダウンロード</button>
 
     <script>
         function generateMenuForms() {
@@ -125,8 +125,13 @@ function Main()
                 // チート名とON/OFFコードの入力を取得
                 for (let j = 1; j <= cheatCount; j++) {
                     const cheatName = document.getElementById(`cheatName${i}_${j}`).value;
-                    const onCode = prompt(`${cheatName} のONコードを入力してください:`);
-                    const offCode = prompt(`${cheatName} のOFFコードを入力してください:`);
+                    let onCode = prompt(`${cheatName} のONコードを入力してください:`);
+                    let offCode = prompt(`${cheatName} のOFFコードを入力してください:`);
+
+                    // 余分な空白を削除し、改行
+                    onCode = formatCode(onCode);
+                    offCode = formatCode(offCode);
+
                     submenuItems.push({ name: cheatName, onCode: onCode, offCode: offCode });
                 }
 
@@ -184,24 +189,43 @@ function Main()
                     const offCode = submenuItems[j].offCode;
                     lua_script += `\nfunction B${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')}()\n`;
                     lua_script += `    if toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')} then\n`;
-                    lua_script += `        ${offCode}\n`;
-                    lua_script += `    else\n`;
-                    lua_script += `        ${onCode}\n`;
-                    lua_script += `    end\n`;
-                    lua_script += `    toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')} = not toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')}\n`;
+                    lua_script += `        gg.clearResults()\n${offCode}\n`;
+                    lua_script += `        toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')} = false\n`;
+                    lua_script += '    else\n';
+                    lua_script += `        gg.clearResults()\n${onCode}\n`;
+                    lua_script += `        toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')} = true\n`;
+                    lua_script += '    end\n';
                     lua_script += `    AAA${i}()\n`;
                     lua_script += 'end\n';
                 }
             }
 
-            lua_script += '\nfunction exit()\n';
-            lua_script += '    gg.toast("Easy Script by t0x1c")\n';
-            lua_script += '    os.exit()\n';
-            lua_script += 'end\n';
+            lua_script += '\nfunction exit()\n    gg.toast("Easy Script by t0x1c")\n    gg.clearResults()\n    os.exit()\nend\n';
+            lua_script += 'while true do\n    if gg.isVisible() then\n        gg.setVisible(false)\n        Main()\n    end\n    gg.sleep(10) \nend\n';
 
-            // 結果を表示
             document.getElementById('generatedScript').textContent = lua_script;
             document.getElementById('downloadButton').style.display = 'block';
+        }
+
+        function formatCode(code) {
+            if (!code) return ''; // 空の場合は空文字列を返す
+
+            // 余分な空白を削除して、改行で区切る
+            return code
+  	     .replace(/\s+/g, ' ') // すべての空白を1つの空白に変換
+   	     .trim() // 前後の空白を削除
+	     .replace(/\)\s*/g, ')\n') // ) の後に改行を追加
+        }
+
+        function downloadScript() {
+            const scriptContent = document.getElementById('generatedScript').textContent;
+            const blob = new Blob([scriptContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'generated_script.lua';
+            a.click();
+            URL.revokeObjectURL(url);
         }
     </script>
 
