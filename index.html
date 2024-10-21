@@ -232,17 +232,18 @@ function Main()
         }
 
         function downloadScript() {
-            const scriptContent = document.getElementById('EasyScript')
-            const blob = new Blob([scriptContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'EasyScript.lua';
-	　　document.body.appendChild(a);
-            a.click();
-	　　document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
+	    const scriptContent = document.getElementById('generatedScript').textContent;
+	    console.log('Script content:', scriptContent); // コンソールで中身を確認
+	    const blob = new Blob([scriptContent], { type: 'text/plain' });
+	    const url = URL.createObjectURL(blob);
+	    const a = document.createElement('a');
+	    a.href = url;
+	    a.download = 'generated_script.lua'; // 拡張子を.luaに設定
+	    document.body.appendChild(a); // 一時的にリンクを追加
+	    a.click();
+	    document.body.removeChild(a); // 使用後にリンクを削除
+	    URL.revokeObjectURL(url);
+	}
     </script>
 
 </body>
