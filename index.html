@@ -107,6 +107,23 @@
 
         function generateScript() {
             const menuCount = document.getElementById('menu_count').value;
+
+    for (let i = 1; i <= menuCount; i++) {
+        const menuName = document.getElementById(`menuName${i}`).value;
+        if (!menuName.trim()) {
+            alert(`メニュー名${i}が未入力です。`);
+            return;
+        }
+        
+        const cheatCount = document.getElementById(`cheatCount${i}`).value;
+        for (let j = 1; j <= cheatCount; j++) {
+            const cheatName = document.getElementById(`cheatName${i}_${j}`).value;
+            if (!cheatName.trim()) {
+                alert(`チート${j}の名前が未入力です。`);
+                return;
+            }
+        }
+    }
             let lua_script = `
 gg.clearResults()
 gg.alert("made by t0x1c", 'start')
@@ -114,15 +131,12 @@ gg.alert("made by t0x1c", 'start')
 function Main()
     local menu = gg.choice({
             `;
-
-            // メニュー名を取得
             const menuData = [];
             for (let i = 1; i <= menuCount; i++) {
                 const menuName = document.getElementById(`menuName${i}`).value;
                 const cheatCount = document.getElementById(`cheatCount${i}`).value;
                 let submenuItems = [];
 
-                // チート名とON/OFFコードの入力を取得
                 for (let j = 1; j <= cheatCount; j++) {
                     const cheatName = document.getElementById(`cheatName${i}_${j}`).value;
                     let onCode = prompt(`${cheatName} のONコードを入力してください:`);
@@ -134,7 +148,7 @@ function Main()
 
                     submenuItems.push({ name: cheatName, onCode: onCode, offCode: offCode });
                 }
-
+		
                 menuData.push({ name: menuName, submenuItems: submenuItems });
                 lua_script += `        "${menuName}",\n`;
             }
@@ -145,12 +159,13 @@ function Main()
             lua_script += '    if menu == nil then\n';
             lua_script += '        return\n';
             lua_script += '    end\n';
-
+	    
             for (let i = 1; i <= menuCount; i++) {
                 lua_script += `    if menu == ${i} then AAA${i}() end\n`;
             }
-
-            lua_script += `    if menu == ${menuCount + 1} then exit() end\n`;
+		
+	    
+            lua_script += `    if menu == ${Number(menuCount) + 1} then exit() end\n`;
             lua_script += 'end\n\n';
 
             for (let i = 1; i <= menuCount; i++) {
@@ -190,12 +205,10 @@ function Main()
                     lua_script += `\nfunction B${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')}()\n`;
                     lua_script += `    if toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')} then\n`;
                     lua_script += `        gg.clearResults()\n${offCode}\n`;
-                    lua_script += `        toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')} = false\n`;
                     lua_script += '    else\n';
                     lua_script += `        gg.clearResults()\n${onCode}\n`;
-                    lua_script += `        toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')} = true\n`;
                     lua_script += '    end\n';
-                    lua_script += `    AAA${i}()\n`;
+       		    lua_script += `    toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')} = not toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')}\n`;
                     lua_script += 'end\n';
                 }
             }
@@ -208,17 +221,16 @@ function Main()
         }
 
         function formatCode(code) {
-            if (!code) return ''; // 空の場合は空文字列を返す
+            if (!code) return '';
 
-            // 余分な空白を削除して、改行で区切る
             return code
-  	     .replace(/\s+/g, ' ') // すべての空白を1つの空白に変換
-   	     .trim() // 前後の空白を削除
-	     .replace(/\)\s*/g, ')\n') // ) の後に改行を追加
+  	     .replace(/\s+/g, ' ') 
+   	     .trim() 
+	     .replace(/\)\s*/g, ')\n') 
         }
 
         function downloadScript() {
-            const scriptContent = document.getElementById('generatedScript').textContent;
+            const scriptContent = document.getElementById('Easy-Scripts').textContent;
             const blob = new Blob([scriptContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
