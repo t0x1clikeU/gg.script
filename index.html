@@ -50,7 +50,7 @@
 </head>
 <body>
 
-    <h1>Lua スクリプト生成ツール</h1>
+    <h1>Lua Easy Script!</h1>
     <h1>Dev by t0x1c</h1>
     <p><a href="https://discord.gg/t0xxx" target="_blank">Join Discord!</a></p>
     
@@ -189,47 +189,21 @@ function Main()
                     lua_script += `        ${onCode}\n`;
                     lua_script += `    end\n`;
                     lua_script += `    toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')} = not toggle_${String(i).padStart(3, '0')}_${String(j + 1).padStart(3, '0')}\n`;
+                    lua_script += `    AAA${i}()\n`;
                     lua_script += 'end\n';
                 }
             }
 
-            lua_script += `
-function exit()
-    gg.toast("終了!")
-    print("Easy Script by t0x1c")
-    gg.clearResults()
-    os.exit()    
-end
+            lua_script += '\nfunction exit()\n';
+            lua_script += '    gg.toast("Easy Script by t0x1c")\n';
+            lua_script += '    os.exit()\n';
+            lua_script += 'end\n';
 
-while true do 
-    if gg.isVisible() then
-        gg.setVisible(false)
-        Main()
-    end
-    gg.sleep(10)
-end
-`;
-
-            // スクリプトを表示
+            // 結果を表示
             document.getElementById('generatedScript').textContent = lua_script;
-
-            // ダウンロードボタンを表示
-            const downloadButton = document.getElementById('downloadButton');
-            downloadButton.style.display = 'inline';
-            downloadButton.onclick = () => downloadScript(lua_script);
-        }
-
-        function downloadScript(script) {
-            const blob = new Blob([script], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'generated_script.lua';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            document.getElementById('downloadButton').style.display = 'block';
         }
     </script>
+
 </body>
 </html>
