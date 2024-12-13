@@ -73,7 +73,7 @@
         function generateMenuForms() {
             const menuCount = document.getElementById('menu_count').value;
             const menuFormsContainer = document.getElementById('menuForms');
-            menuFormsContainer.innerHTML = ''; // 既存のフォームをクリア
+            menuFormsContainer.innerHTML = '';
 
             for (let i = 1; i <= menuCount; i++) {
                 const menuDiv = document.createElement('div');
@@ -88,13 +88,13 @@
                 `;
                 menuFormsContainer.appendChild(menuDiv);
             }
-            generateCheatForms(1); // 初回メニューのチートフォームを生成
+            generateCheatForms(1);
         }
 
         function generateCheatForms(menuIndex) {
             const cheatCount = document.getElementById(`cheatCount${menuIndex}`).value;
             const container = document.getElementById(`cheatForms${menuIndex}`);
-            container.innerHTML = ''; // 既存のフォームをクリア
+            container.innerHTML = '';
 
             for (let j = 1; j <= cheatCount; j++) {
                 const cheatDiv = document.createElement('div');
@@ -144,7 +144,6 @@ function Main()
                     let onCode = prompt(`${cheatName} のONコードを入力してください:`);
                     let offCode = prompt(`${cheatName} のOFFコードを入力してください:`);
 
-                    // 余分な空白を削除し、改行
                     onCode = formatCode(onCode);
                     offCode = formatCode(offCode);
 
@@ -233,15 +232,15 @@ function Main()
 
         function downloadScript() {
 	    const scriptContent = document.getElementById('generatedScript').textContent;
-	    console.log('Script content:', scriptContent); // コンソールで中身を確認
+	    console.log('Script content:', scriptContent);
 	    const blob = new Blob([scriptContent], { type: 'text/plain' });
 	    const url = URL.createObjectURL(blob);
 	    const a = document.createElement('a');
 	    a.href = url;
-	    a.download = 'generated_script.lua'; // 拡張子を.luaに設定
-	    document.body.appendChild(a); // 一時的にリンクを追加
+	    a.download = 'generated_script.lua';
+	    document.body.appendChild(a);
 	    a.click();
-	    document.body.removeChild(a); // 使用後にリンクを削除
+	    document.body.removeChild(a);
 	    URL.revokeObjectURL(url);
 	}
     </script>
