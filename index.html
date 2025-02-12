@@ -215,7 +215,7 @@ function Main()
             }
 
             lua_script += '\nfunction exit()\n    gg.toast("Easy Script by t0x1c")\n    gg.clearResults()\n    os.exit()\nend\n';
-            lua_script += 'while true do\n    if gg.isVisible() then\n        gg.setVisible(false)\n            end\n    Main() \nend\n';
+            lua_script += 'while true do\n    if gg.isVisible() then\n        gg.setVisible(false)\n        Main()\n    end\n    gg.sleep(10) \nend\n';
 
             document.getElementById('generatedScript').textContent = lua_script;
             document.getElementById('downloadButton').style.display = 'block';
